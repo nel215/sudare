@@ -11,8 +11,6 @@ pub fn rank(x: i64, i: i32) -> i32 {
 }
 #[test]
 fn it_works() {
-    let bv = bitvector::new(1);
-    assert_eq!(bv.size, 1);
     assert_eq!(rank(0b10, 1), 0);
     assert_eq!(rank(0b10, 2), 1);
 }
