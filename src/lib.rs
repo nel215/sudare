@@ -1,4 +1,5 @@
 pub mod bitvector;
+pub mod wavelet_tree;
 
 pub fn rank(x: i64, i: i32) -> i32 {
     let mut res = 0;
