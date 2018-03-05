@@ -1,7 +1,9 @@
 use std::collections;
+use bitvector;
 
 pub struct WaveletTree {
     pub height: usize,
+    pub root: bitvector::BitVector,
 }
 
 pub fn new(_text: &str) -> WaveletTree {
@@ -16,7 +18,14 @@ pub fn new(_text: &str) -> WaveletTree {
     while (1 << height) < alphabet.len() {
         height += 1;
     }
-    return WaveletTree { height };
+    // construct nodes
+    let n = _text.len();
+    let mut root = bitvector::new(n);
+    for (i, c) in _text.chars().enumerate() {
+        let b = (alphabet[&c] >> (height - 1)) & 1;
+        root.set(i, b);
+    }
+    return WaveletTree { height, root };
 }
 
 #[test]
@@ -25,6 +34,8 @@ fn test_new() {
     assert_eq!(wt1.height, 1);
     let wt2 = new("ab");
     assert_eq!(wt2.height, 1);
+    assert_eq!(wt2.root.get(0), 0);
+    assert_eq!(wt2.root.get(1), 1);
     let wt3 = new("abc");
     assert_eq!(wt3.height, 2);
     let wt4 = new("abcd");
