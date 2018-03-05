@@ -7,6 +7,7 @@ pub struct WaveletTree {
 }
 
 pub fn new(_text: &str) -> WaveletTree {
+    let n = _text.len();
     let mut alphabet = collections::HashMap::<char, usize>::new();
     for c in _text.chars() {
         if !alphabet.contains_key(&c) {
@@ -14,16 +15,20 @@ pub fn new(_text: &str) -> WaveletTree {
             alphabet.insert(c, id);
         }
     }
+    // char to usize
+    let mut text = vec![0; n];
+    for (i, c) in _text.chars().enumerate() {
+        text[i] = alphabet[&c];
+    }
+    let text = text;
     let mut height = 1;
     while (1 << height) < alphabet.len() {
         height += 1;
     }
     // construct nodes
-    let n = _text.len();
     let mut root = bitvector::new(n);
-    for (i, c) in _text.chars().enumerate() {
-        let b = (alphabet[&c] >> (height - 1)) & 1;
-        root.set(i, b);
+    for (i, b) in text.iter().enumerate() {
+        root.set(i, (b >> (height - 1)) & 1);
     }
     return WaveletTree { height, root };
 }
