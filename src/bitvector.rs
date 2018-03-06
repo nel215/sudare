@@ -10,6 +10,13 @@ impl BitVector {
     pub fn get(&self, i: usize) -> u32 {
         return (self.data[i / 32] >> (i % 32)) & 1;
     }
+    pub fn rank(&self, i: usize) -> usize {
+        let mut res = 0;
+        for j in 0..i {
+            res += (self.data[j / 32] >> (j % 32)) & 1;
+        }
+        return res as usize;
+    }
 }
 pub fn new(n: usize) -> BitVector {
     let mut large_size: usize = 0;
