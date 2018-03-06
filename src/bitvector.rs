@@ -39,6 +39,28 @@ impl BitVector {
     }
 }
 
+pub struct BitVectorBuilder {
+    pub data: Vec<u32>,
+    pub size: usize,
+}
+
+impl BitVectorBuilder {
+    pub fn new() -> BitVectorBuilder {
+        let data = Vec::new();
+        BitVectorBuilder { data, size: 0 }
+    }
+    pub fn push(&mut self, b: usize) {
+        if self.data.len() * 32 <= self.size {
+            self.data.push(0);
+        }
+        if b > 0 {
+            let last = self.data.len() - 1;
+            self.data[last] |= 1 << (self.size % 32);
+        }
+        self.size += 1
+    }
+}
+
 
 #[test]
 fn check_size() {
@@ -51,4 +73,12 @@ fn check_size() {
     let bv3 = BitVector::new(257);
     assert_eq!(bv3.large_sum.len(), 2);
     assert_eq!(bv3.small_sum.len(), 9);
+}
+
+#[test]
+fn test_builder() {
+    let mut builder = BitVectorBuilder::new();
+    builder.push(0);
+    builder.push(1);
+    assert_eq!(builder.size, 2);
 }
