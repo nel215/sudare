@@ -3,13 +3,13 @@ use bitvector;
 
 pub struct WaveletTree {
     pub height: usize,
-    pub root: bitvector::BitVector,
+    pub nodes: Vec<bitvector::BitVector>,
     utoc: Vec<char>,
 }
 
 impl WaveletTree {
     pub fn access(&self, i: usize) -> char {
-        let b = self.root.get(i) as usize;
+        let b = self.nodes[0].get(i) as usize;
         return self.utoc[b];
     }
     pub fn new(_text: &str) -> WaveletTree {
@@ -34,27 +34,43 @@ impl WaveletTree {
             height += 1;
         }
         // construct nodes
-        let mut root = bitvector::BitVectorBuilder::new();
-        for b in text {
-            root.push((b >> (height - 1)) & 1);
+        let mut builders = Vec::new();
+        for _ in 0..((1 << height) - 1) {
+            builders.push(bitvector::BitVectorBuilder::new());
         }
-        let root = root.build();
-        return WaveletTree { height, root, utoc };
+        for bs in text {
+            let mut i = 0;
+            for h in 0..height {
+                let b = (bs >> (height - 1 - h)) & 1;
+                builders[i].push(b);
+                i = 2 * i + 1 + b;
+            }
+        }
+        let mut nodes = Vec::new();
+        for b in builders {
+            nodes.push(b.build());
+        }
+        WaveletTree {
+            height,
+            nodes,
+            utoc,
+        }
     }
 }
-
-
 
 #[test]
 fn test_new() {
     let wt1 = WaveletTree::new("a");
     assert_eq!(wt1.height, 1);
+    assert_eq!(wt1.nodes.len(), 1);
     let wt2 = WaveletTree::new("ab");
     assert_eq!(wt2.height, 1);
-    assert_eq!(wt2.root.get(0), 0);
-    assert_eq!(wt2.root.get(1), 1);
+    assert_eq!(wt2.nodes.len(), 1);
+    assert_eq!(wt2.nodes[0].get(0), 0);
+    assert_eq!(wt2.nodes[0].get(1), 1);
     let wt3 = WaveletTree::new("abc");
     assert_eq!(wt3.height, 2);
+    assert_eq!(wt3.nodes.len(), 3);
     let wt4 = WaveletTree::new("abcd");
     assert_eq!(wt4.height, 2);
 }
