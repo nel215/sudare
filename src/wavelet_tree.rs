@@ -36,10 +36,11 @@ pub fn new(_text: &str) -> WaveletTree {
         height += 1;
     }
     // construct nodes
-    let mut root = bitvector::BitVector::new(n);
-    for (i, b) in text.iter().enumerate() {
-        root.set(i, (b >> (height - 1)) & 1);
+    let mut root = bitvector::BitVectorBuilder::new();
+    for b in text {
+        root.push((b >> (height - 1)) & 1);
     }
+    let root = root.build();
     return WaveletTree { height, root, utoc };
 }
 

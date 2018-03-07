@@ -13,9 +13,6 @@ impl BitVector {
         let large_sum = vec![0; large_size];
         return BitVector { data, large_sum };
     }
-    pub fn set(&mut self, i: usize, b: usize) {
-        self.data[i / 64] |= (b as u64) << (i % 64);
-    }
     pub fn get(&self, i: usize) -> u64 {
         return (self.data[i / 64] >> (i % 64)) & 1;
     }
