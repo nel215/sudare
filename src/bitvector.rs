@@ -61,6 +61,14 @@ impl BitVectorBuilder {
     }
 }
 
+pub fn rank(b: u64) -> usize {
+    let mut b = (b & 0x55555555) + (b >> 1 & 0x55555555);
+    b = (b & 0x33333333) + (b >> 2 & 0x33333333);
+    b = (b & 0x0f0f0f0f) + (b >> 4 & 0x0f0f0f0f);
+    b = (b & 0x00ff00ff) + (b >> 8 & 0x00ff00ff);
+    b = (b & 0x0000ffff) + (b >> 16 & 0x0000ffff);
+    b as usize
+}
 
 #[test]
 fn check_size() {
@@ -81,4 +89,11 @@ fn test_builder() {
     builder.push(0);
     builder.push(1);
     assert_eq!(builder.size, 2);
+}
+
+#[test]
+fn test_rank() {
+    assert_eq!(rank(0b1), 1);
+    assert_eq!(rank(0b111), 3);
+    assert_eq!(rank(0b11111), 5);
 }
