@@ -9,8 +9,20 @@ pub struct WaveletTree {
 
 impl WaveletTree {
     pub fn access(&self, i: usize) -> char {
-        let b = self.nodes[0].get(i) as usize;
-        return self.utoc[b];
+        let mut i = i;
+        let mut bs = 0;
+        let mut node_id = 0;
+        for _ in 0..self.height {
+            let b = self.nodes[node_id].get(i) as usize;
+            if b == 0 {
+                i = i - self.nodes[node_id].rank(i);
+            } else {
+                i = self.nodes[node_id].rank(i);
+            }
+            bs = (bs << 1) | b;
+            node_id = 2 * node_id + 1 + b;
+        }
+        return self.utoc[bs];
     }
     pub fn new(_text: &str) -> WaveletTree {
         let n = _text.len();
@@ -77,6 +89,9 @@ fn test_new() {
 
 #[test]
 fn test_access() {
-    let wt1 = WaveletTree::new("a");
+    let wt1 = WaveletTree::new("abcd");
     assert_eq!(wt1.access(0), 'a');
+    assert_eq!(wt1.access(1), 'b');
+    assert_eq!(wt1.access(2), 'c');
+    assert_eq!(wt1.access(3), 'd');
 }
