@@ -4,6 +4,7 @@ use bitvector;
 pub struct WaveletTree {
     pub height: usize,
     pub nodes: Vec<bitvector::BitVector>,
+    ctou: collections::HashMap<char, usize>,
     utoc: Vec<char>,
 }
 
@@ -19,6 +20,17 @@ impl WaveletTree {
             node_id = 2 * node_id + 1 + b;
         }
         return self.utoc[bs];
+    }
+    pub fn rank(&self, i: usize, c: &char) -> usize {
+        let mut i = i;
+        let t = self.ctou[c];
+        let mut node_id = 0;
+        for d in 0..self.height {
+            let b = (t >> (self.height - 1 - d)) & 1;
+            i = self.nodes[node_id].rank(i, b);
+            node_id = 2 * node_id + 1 + b;
+        }
+        i
     }
     pub fn new(_text: &str) -> WaveletTree {
         let n = _text.len();
@@ -62,6 +74,7 @@ impl WaveletTree {
             height,
             nodes,
             utoc,
+            ctou: alphabet,
         }
     }
 }
@@ -90,4 +103,17 @@ fn test_access() {
     assert_eq!(wt1.access(1), 'b');
     assert_eq!(wt1.access(2), 'c');
     assert_eq!(wt1.access(3), 'd');
+}
+
+#[test]
+fn test_rank() {
+    let wt1 = WaveletTree::new("abcd");
+    assert_eq!(wt1.rank(0, &'a'), 0);
+    assert_eq!(wt1.rank(1, &'a'), 1);
+    assert_eq!(wt1.rank(1, &'b'), 0);
+    assert_eq!(wt1.rank(2, &'b'), 1);
+    assert_eq!(wt1.rank(2, &'c'), 0);
+    assert_eq!(wt1.rank(3, &'c'), 1);
+    assert_eq!(wt1.rank(3, &'d'), 0);
+    assert_eq!(wt1.rank(4, &'d'), 1);
 }
