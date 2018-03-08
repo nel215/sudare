@@ -16,7 +16,7 @@ impl BitVector {
     pub fn get(&self, i: usize) -> u64 {
         return (self.data[i / 64] >> (i % 64)) & 1;
     }
-    pub fn rank(&self, i: usize) -> usize {
+    pub fn _rank(&self, i: usize) -> usize {
         let mut res = 0;
         let j = i / 256;
         if j > 0 {
@@ -30,6 +30,13 @@ impl BitVector {
         let mask = (1 << (i % 64)) - 1;
         res += rank(self.data[j] & mask);
         return res as usize;
+    }
+    pub fn rank(&self, i: usize, b: usize) -> usize {
+        if b == 1 {
+            self._rank(i)
+        } else {
+            i - self._rank(i)
+        }
     }
 }
 
@@ -106,10 +113,10 @@ fn test_builder() {
     assert_eq!(bv.large_sum.len(), 2);
     assert_eq!(bv.large_sum[0], 1);
     assert_eq!(bv.large_sum[1], 2);
-    assert_eq!(bv.rank(0), 0);
-    assert_eq!(bv.rank(1), 1);
-    assert_eq!(bv.rank(256), 1);
-    assert_eq!(bv.rank(257), 2);
+    assert_eq!(bv.rank(0, 1), 0);
+    assert_eq!(bv.rank(1, 1), 1);
+    assert_eq!(bv.rank(256, 1), 1);
+    assert_eq!(bv.rank(257, 1), 2);
 }
 
 #[test]

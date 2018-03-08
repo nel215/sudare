@@ -14,11 +14,7 @@ impl WaveletTree {
         let mut node_id = 0;
         for _ in 0..self.height {
             let b = self.nodes[node_id].get(i) as usize;
-            if b == 0 {
-                i = i - self.nodes[node_id].rank(i);
-            } else {
-                i = self.nodes[node_id].rank(i);
-            }
+            i = self.nodes[node_id].rank(i, b);
             bs = (bs << 1) | b;
             node_id = 2 * node_id + 1 + b;
         }
